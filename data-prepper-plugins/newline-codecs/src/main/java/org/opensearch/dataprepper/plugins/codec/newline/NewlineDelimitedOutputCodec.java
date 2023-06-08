@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.opensearch.dataprepper.plugins.codec.newline;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPlugin;
 import org.opensearch.dataprepper.model.annotations.DataPrepperPluginConstructor;
 import org.opensearch.dataprepper.model.codec.OutputCodec;
@@ -20,6 +21,8 @@ import java.util.Objects;
 public class NewlineDelimitedOutputCodec implements OutputCodec {
     private static final String NDJSON="ndjson";
     private static final String MESSAGE_FIELD_NAME = "message";
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @DataPrepperPluginConstructor
     public NewlineDelimitedOutputCodec(){
@@ -52,7 +55,9 @@ public class NewlineDelimitedOutputCodec implements OutputCodec {
                     headerRecord = value;
                 }
             }
+            if(headerRecord!=null)
             writeArrayToOutputStream(outputStream, headerRecord);
+            else if(messageRecord!=null)
             writeArrayToOutputStream(outputStream, messageRecord);
         } else {
             writeArrayToOutputStream(outputStream, eventDataMap.get(MESSAGE_FIELD_NAME));
@@ -60,7 +65,15 @@ public class NewlineDelimitedOutputCodec implements OutputCodec {
     }
 
     private void writeArrayToOutputStream(final OutputStream outputStream,final Object object) throws IOException {
-        final byte[] byteArr = object.toString().getBytes();
+        byte[] byteArr = null;
+        if(object instanceof Map) {
+            //todo
+            String json = objectMapper.writeValueAsString(object);
+            byteArr = json.toString().getBytes();
+        }
+        else{
+            byteArr = object.toString().getBytes();
+        }
         outputStream.write(byteArr);
         outputStream.write(System.lineSeparator().getBytes());
     }

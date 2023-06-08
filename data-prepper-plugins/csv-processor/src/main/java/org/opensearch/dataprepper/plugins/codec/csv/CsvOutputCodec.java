@@ -15,12 +15,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * An implementation of {@link OutputCodec} which deserializes Data-Prepper events and writes them to Output Stream as CSV Data
  */
 @DataPrepperPlugin(name = "csv", pluginType = OutputCodec.class, pluginConfigurationType = CsvOutputCodecConfig.class)
 public class CsvOutputCodec implements OutputCodec {
     private final CsvOutputCodecConfig config;
+    private static final Logger LOG = LoggerFactory.getLogger(CsvOutputCodec.class);
     private static final String CSV = "csv";
     private static int headerLength = 0;
 
@@ -49,8 +52,8 @@ public class CsvOutputCodec implements OutputCodec {
         Objects.requireNonNull(event);
         final Collection<Object> values = event.toMap().values();
         if (headerLength != values.size()) {
-            // TODO: Log error
-            return;
+           LOG.error("CSV Row doesn't conform with the header.");
+           return;
         }
         final byte[] byteArr = values.stream().
                 map(Object::toString).collect(Collectors.joining(config.getDelimiter())).getBytes();

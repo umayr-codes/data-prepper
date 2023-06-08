@@ -74,11 +74,12 @@ public class AvroOutputCodec implements OutputCodec {
     static Schema parseSchema(final String schemaString) {
         Objects.requireNonNull(schemaString);
         // todo : Parse schemaString and generate Schema
-        return SchemaBuilder.record("Person")
+        /*return SchemaBuilder.record("Person")
                 .fields()
                 .name("name").type().stringType().noDefault()
                 .name("age").type().intType().noDefault()
-                .endRecord();
+                .endRecord();*/
+        return new Schema.Parser().parse(schemaString);
 
     }
 
