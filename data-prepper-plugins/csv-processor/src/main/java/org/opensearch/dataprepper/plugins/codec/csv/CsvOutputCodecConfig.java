@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * Configuration class for {@link CsvOutputCodec}.
+ */
 public class CsvOutputCodecConfig {
     static final String DEFAULT_DELIMITER = ",";
 
@@ -16,6 +19,9 @@ public class CsvOutputCodecConfig {
 
     @JsonProperty("schema")
     private List<String> header;
+    public CsvOutputCodecConfig(List<String> schema){
+        this.header = schema;
+    }
 
     public String getDelimiter() {
         return delimiter;
