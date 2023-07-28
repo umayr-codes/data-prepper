@@ -29,12 +29,25 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.opensearch.dataprepper.plugins.codec.avro.AvroSchemaParserFromTabularFormat.generateSchemaFromTabular;
 
 public class AvroOutputCodecTest {
     private static String expectedSchemaString = "{\"type\":\"record\",\"name\":\"AvroRecords\",\"fields\":[{\"name\"" +
             ":\"name\",\"type\":\"string\"},{\"name\":\"nestedRecord\",\"type\":{\"type\":\"record\",\"name\":" +
             "\"NestedRecord1\",\"fields\":[{\"name\":\"secondFieldInNestedRecord\",\"type\":\"int\"},{\"name\":\"" +
             "firstFieldInNestedRecord\",\"type\":\"string\"}]}},{\"name\":\"age\",\"type\":\"int\"}]}";
+    private static String getExpectedSchemaStringTabular="{\"type\":\"record\",\"name\":\"sesblog\",\"fields\":[{\"name\"" +
+            ":\"eventType\",\"type\":\"string\"},{\"name\":\"ews\",\"type\":\"string\"},{\"name\":\"mail\",\"type\":" +
+            "{\"type\":\"record\",\"name\":\"sesblog_0\",\"fields\":[{\"name\":\"col1\",\"type\":\"string\"},{\"name\":\"" +
+            "innercolName\",\"type\":{\"type\":\"record\",\"name\":\"sesblog_1\",\"fields\":[{\"name\":\"colInner\"," +
+            "\"type\":\"string\"}]}}]}},{\"name\":\"collumn2\",\"type\":\"string\"}]}";
+    private static String inputString = "TABLE sesblog (\n" +
+            "  eventType string,\n" +
+            "  ews string,\n" +
+            "  mail struct<col1:string,\n" +
+            "              innercolName struct<colInner:string> \n" +
+            "              >,\n" +
+            "  collumn2 string) ";
     private AvroOutputCodecConfig config;
 
     private ByteArrayOutputStream outputStream;
@@ -173,5 +186,12 @@ public class AvroOutputCodecTest {
             eventData.put(field.name(), value);
         }
         return eventData;
+    }
+
+    @Test
+    public void testTabularSchemaParser(){
+        Schema expectedSchema = new Schema.Parser().parse(getExpectedSchemaStringTabular);
+        Schema actualSchema=AvroSchemaParserFromTabularFormat.generateSchemaFromTabular(inputString);
+        assertThat(actualSchema, Matchers.equalTo(expectedSchema));
     }
 }

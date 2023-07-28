@@ -45,6 +45,9 @@ public class AvroOutputCodecConfig {
     @JsonProperty("file_key")
     private String fileKey;
 
+    @JsonProperty("tabular_schema")
+    private String tabularSchemaString;
+
     public List<String> getExcludeKeys() {
         return excludeKeys;
     }
@@ -78,6 +81,12 @@ public class AvroOutputCodecConfig {
     }
     public void setExcludeKeys(List<String> excludeKeys) {
         this.excludeKeys = excludeKeys;
+    }
+    public String getTabularSchemaString() {
+        return tabularSchemaString;
+    }
+    public void setTabularSchemaString(String tabularSchemaString) {
+        this.tabularSchemaString = tabularSchemaString;
     }
 
 }
